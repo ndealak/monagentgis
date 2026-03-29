@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { getTheme } from "../theme";
+import { useThemeContext } from "../theme";
 import { F, M } from "../config";
 
 // ── Helper : applique une ombre de texte forte pour lisibilité sans fond ──
@@ -30,9 +30,39 @@ function drawOverlaysOnCanvas(ctx, W, H, opts) {
     if (visLayers.length > 0) {
       // Construire les lignes de légende selon le type de classification
       let lines = [];
+      // Classes WorldCover (identiques à Legend.jsx)
+      const WORLDCOVER_CLASSES = [
+        { label: "Arbre",           color: "#006400" },
+        { label: "Arbuste",         color: "#ffbb22" },
+        { label: "Prairie",         color: "#ffff4c" },
+        { label: "Culture",         color: "#f096ff" },
+        { label: "Bâti",            color: "#fa0000" },
+        { label: "Sol nu",          color: "#b4b4b4" },
+        { label: "Neige/Glace",     color: "#f0f0f0" },
+        { label: "Eau",             color: "#0064c8" },
+        { label: "Zone humide",     color: "#0096a0" },
+        { label: "Mangrove",        color: "#00cf75" },
+        { label: "Mousse/Lichen",   color: "#fae6a0" },
+      ];
+
       visLayers.forEach(l => {
         lines.push({ type: "layer", layer: l });
         const cr = l.classResult;
+
+        // ── Raster GEE ──────────────────────────────────────────
+        if (l.isRaster && l.visParams) {
+          const vp   = l.visParams;
+          const name = l.name || "";
+          const isWorldCover = name.includes("WorldCover") || name.includes("Occupation du sol");
+          const isRGB        = name.includes("RGB") || name.includes("False Color");
+          if (isWorldCover) {
+            lines.push({ type: "gee_worldcover", classes: WORLDCOVER_CLASSES });
+          } else if (!isRGB && vp.palette?.length) {
+            const colors = vp.palette.map(c => c.startsWith("#") ? c : "#" + c);
+            lines.push({ type: "gee_gradient", colors, min: vp.min ?? 0, max: vp.max ?? 1 });
+          }
+          return; // RGB → juste le nom, pas de légende supplémentaire
+        }
 
         if (cr?.type === "categorized") {
           cr.entries?.slice(0, 6).forEach(e =>
@@ -71,7 +101,15 @@ function drawOverlaysOnCanvas(ctx, W, H, opts) {
 
       const lineH  = FONT * 1.9;
       const boxW   = Math.round(W * 0.24);
-      const boxH   = PAD + lines.length * lineH + PAD;
+      // Hauteur dynamique : les lignes GEE (gradient, worldcover) occupent plus qu'une ligne fixe
+      const estimatedH = lines.reduce((acc, ln) => {
+        if (ln.type === "gee_worldcover") return acc + ln.classes.length * (SMALL * 1.65);
+        if (ln.type === "gee_gradient")   return acc + Math.round(SMALL * 0.72) + SMALL * 1.8;
+        if (ln.type === "prop_circles_nested") return acc + Math.max(4, Math.min(FONT * 2.2, ln.maxR * (FONT / 10))) * 2 + PAD * 2;
+        if (ln.type === "prop_lines_nested") return acc + ln.entries.length * (SMALL * 1.8) + PAD;
+        return acc + lineH;
+      }, 0);
+      const boxH   = PAD + estimatedH + PAD;
       const margin = PAD * 2.5;
 
       let bx, by;
@@ -181,6 +219,59 @@ function drawOverlaysOnCanvas(ctx, W, H, opts) {
           });
 
           ly += line.entries.length * (SMALL * 1.8) + PAD;
+          return;
+
+        } else if (line.type === "gee_worldcover") {
+          // WorldCover : classes catégorielles colorées
+          const rowH = SMALL * 1.65;
+          line.classes.forEach(({ label, color }) => {
+            setShadow(ctx, SH * 0.5);
+            ctx.fillStyle = color;
+            ctx.fillRect(bx + PAD * 1.2, ly - SMALL * 0.7, SMALL * 0.75, SMALL * 0.75);
+            clearShadow(ctx);
+            setShadow(ctx, SH);
+            ctx.fillStyle = "#ffffff";
+            ctx.font = `${SMALL}px sans-serif`;
+            ctx.fillText(label, bx + PAD * 1.2 + SMALL + 2, ly);
+            clearShadow(ctx);
+            ly += rowH;
+          });
+          return;
+
+        } else if (line.type === "gee_gradient") {
+          // Palette continue : gradient canvas + labels min/mid/max
+          const barW = Math.round(boxW * 0.78);
+          const barH = Math.round(SMALL * 0.72);
+          const gx   = bx + PAD * 1.2;
+          const gy   = ly - SMALL * 0.55;
+
+          // Gradient via createLinearGradient
+          const grad = ctx.createLinearGradient(gx, 0, gx + barW, 0);
+          line.colors.forEach((c, i) => {
+            grad.addColorStop(i / (line.colors.length - 1), c);
+          });
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(gx, gy, barW, barH, 3);
+          else ctx.rect(gx, gy, barW, barH);
+          ctx.fill();
+
+          // Labels min / mid / max
+          const fmt = v => Math.abs(v) >= 1000 ? v.toFixed(0) : Math.abs(v) >= 1 ? v.toFixed(1) : v.toFixed(2);
+          const mid = (line.min + line.max) / 2;
+          setShadow(ctx, SH);
+          ctx.fillStyle = "#ffffff";
+          ctx.font = `${Math.round(SMALL * 0.88)}px sans-serif`;
+          ctx.textAlign = "left";
+          ctx.fillText(fmt(line.min), gx, gy + barH + SMALL * 1.1);
+          ctx.textAlign = "center";
+          ctx.fillText(fmt(mid), gx + barW / 2, gy + barH + SMALL * 1.1);
+          ctx.textAlign = "right";
+          ctx.fillText(fmt(line.max), gx + barW, gy + barH + SMALL * 1.1);
+          ctx.textAlign = "left";
+          clearShadow(ctx);
+
+          ly += barH + SMALL * 1.8;
           return;
         }
 
@@ -383,7 +474,7 @@ async function buildPreviewCanvas(mapRef, layers, viewState, opts) {
 
 // ── Veil plein écran ────────────────────────────────────────────
 function PreviewVeil({ dataUrl, legendPos, onLegendPos, onClose, previewing }) {
-  const C = getTheme();
+  const C = useThemeContext();
   const corners = [
     { key: "top-left",     style: { top: 8,    left: 8    } },
     { key: "top-right",    style: { top: 8,    right: 44  } }, // décalé à gauche du ✕
@@ -426,10 +517,10 @@ function PreviewVeil({ dataUrl, legendPos, onLegendPos, onClose, previewing }) {
 
 // ── Composant principal ─────────────────────────────────────────
 export default function PrintPanel({ mapRef, layers, viewState, onClose }) {
-  const C = getTheme();
+  const C = useThemeContext();
   const [title, setTitle]             = useState("Carte Overture Maps");
   const [subtitle, setSubtitle]       = useState("");
-  const [sources, setSources]         = useState("Overture Maps Foundation | OpenStreetMap | OpenFreeMap");
+  const [sources, setSources]         = useState("OpenMapAgents | OpenStreetMap | OpenFreeMap");
   const [showLegend, setShowLegend]   = useState(true);
   const [legendPos, setLegendPos]     = useState("bottom-left");
   const [showNorth, setShowNorth]     = useState(true);
