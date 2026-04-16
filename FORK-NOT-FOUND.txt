@@ -1,0 +1,88 @@
+⚠️ LE FORK N'EXISTE PAS ENCORE
+
+Vous n'avez pas encore créé le fork sur GitHub.
+
+C'est facile ! Suivez ces étapes :
+
+═══════════════════════════════════════════════════════════
+
+✅ ÉTAPE 1 : CRÉER LE FORK (sur GitHub)
+
+1. Ouvrez ce lien dans votre navigateur :
+   https://github.com/diouck/openmapagents
+
+2. Vous verrez l'écran du repo d'origine
+
+3. Cherchez le bouton "Fork" en haut à DROITE (après Star)
+   
+   Vous verrez quelque chose comme :
+   ┌─────────────────┐
+   │ Star | Fork | □ │
+   └─────────────────┘
+   
+4. Cliquez sur "Fork"
+
+5. GitHub va vous demander :
+   - Où créer le fork ? → Sélectionnez votre compte
+   - Attendez quelques secondes...
+   
+6. ✅ Bravo ! GitHub affiche votre fork :
+   https://github.com/ndealak/openmapagents
+
+   C'est VOTRE fork maintenant!
+
+═══════════════════════════════════════════════════════════
+
+✅ ÉTAPE 2 : APRÈS CRÉATION (exécuter dans le terminal)
+
+Une fois que le fork est créé sur GitHub, exécutez :
+
+    cd /workspaces/openmapagents && ./setup-fork.sh
+
+Cela va :
+  ✓ Configurer les remotes
+  ✓ Pousser tous vos changements
+  ✓ Afficher les URLs finales
+
+═══════════════════════════════════════════════════════════
+
+❓ OÙ CLIQUER POUR FORK ?
+
+Voici une capture d'écran mentale :
+
+GitHub (openmapagents)
+│
+├─ User ndealak
+│
+├─ ⭐ Star
+├─ 🍴 Fork  ← CLIQUEZ ICI!
+├─ ... 
+│
+└─ Clone button
+    ↓
+   Code (HTTPS/SSH)
+
+═══════════════════════════════════════════════════════════
+
+📋 CHECKLIST
+
+□ J'ai ouverts : https://github.com/diouck/openmapagents
+□ J'ai vus le bouton "Fork" en haut à droite
+□ J'ai cliqué sur "Fork"
+□ J'ai attendu que ça se termine
+□ GitHub m'a montré : https://github.com/ndealak/openmapagents
+□ J'ai exécuté : ./setup-fork.sh
+
+═══════════════════════════════════════════════════════════
+
+💡 BESOIN D'AIDE ?
+
+Si vous ne voyez pas le bouton Fork :
+1. Assurez-vous d'être sur : https://github.com/diouck/openmapagents
+2. Actualisez la page (F5)
+3. Connectez-vous à GitHub si vous n'êtes pas connecté
+4. Réessayez
+
+Une fois le fork créé, relancez le setup-fork.sh !
+
+═══════════════════════════════════════════════════════════

@@ -1,0 +1,194 @@
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║        🎉 CONTABO VPS - DÉPLOIEMENT COMPLET PRÊT 🎉          ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+📋 FICHIERS CRÉÉS POUR CONTABO
+
+✅ CONTABO-DEPLOY.md
+   → Guide complet étape par étape pour Contabo
+   → Explique chaque commande
+   → Troubleshooting
+
+✅ scripts/install-contabo.sh
+   → Installation automatique (Docker, Nginx, SSL)
+   → 5-10 minutes
+
+✅ scripts/setup-nginx.sh
+   → Configuration Nginx + SSL Let's Encrypt
+   → Avec votre domaine
+
+✅ scripts/setup-systemd.sh
+   → Auto-démarrage au reboot
+
+✅ scripts/check-contabo.sh
+   → Vérification du système
+   → Diagnostic rapide
+
+✅ scripts/README.md
+   → Documentation des scripts
+
+═════════════════════════════════════════════════════════════
+
+🚀 DÉPLOIEMENT EN 3 COMMANDES
+
+Étape 1 : Se connecter
+─────────────────────
+  ssh root@votre-ip-contabo
+
+Étape 2 : Installer automatiquement
+────────────────────────────────────
+  git clone https://github.com/diouck/openmapagents.git
+  cd openmapagents
+  ./scripts/install-contabo.sh
+
+Étape 3 : Configurer et lancer
+───────────────────────────────
+  cp .env.example .env
+  nano .env  # Ajouter votre clé OpenAI
+  docker-compose build
+  docker-compose up -d
+
+✅ Application accessible à : http://votre-ip-contabo:8000
+
+═════════════════════════════════════════════════════════════
+
+🌐 ÉTAPES OPTIONNELLES
+
+Avec un domaine (ex: maps.example.com) ?
+─────────────────────────────────────
+  ./scripts/setup-nginx.sh maps.example.com
+  
+  ✅ HTTPS automatique
+  ✅ Redirection HTTP → HTTPS
+  ✅ Certificat SSL gratuit
+
+Auto-démarrage au reboot ?
+──────────────────────────
+  ./scripts/setup-systemd.sh
+  
+  ✅ Relance auto à chaque reboot
+  ✅ Relance auto en cas d'erreur
+
+═════════════════════════════════════════════════════════════
+
+💡 COMMANDES UTILES APRÈS DÉPLOIEMENT
+
+Voir les logs en direct :
+  cd ~/openmapagents && docker-compose logs -f
+
+Redémarrer l'app :
+  docker-compose restart
+
+Arrêter l'app :
+  docker-compose down
+
+Reprendre après arrêt :
+  docker-compose up -d
+
+Voir l'état :
+  docker-compose ps
+
+Vérifier les ressources :
+  free -h && nproc && df -h
+
+Accéder aux logs Nginx :
+  sudo tail -f /var/log/nginx/openmapagents-error.log
+
+═════════════════════════════════════════════════════════════
+
+📊 PERFORMANCE CONTABO
+
+Adapter docker-compose.yml à votre plan Contabo :
+
+Contabo Entry (2 vCPU, 4GB RAM) :
+  DUCKDB_MEMORY: 2GB
+  DUCKDB_THREADS: 2
+
+Contabo Standard M (4 vCPU, 8GB RAM) :
+  DUCKDB_MEMORY: 6GB
+  DUCKDB_THREADS: 4
+
+Contabo Standard L (8 vCPU, 16GB RAM) :
+  DUCKDB_MEMORY: 12GB
+  DUCKDB_THREADS: 8
+
+═════════════════════════════════════════════════════════════
+
+✅ CHECKLIST PRÉ-DÉPLOIEMENT
+
+□ Accès SSH à votre Contabo VPS
+□ Clé OpenAI API obtenue
+□ Domaine DNS (optionnel mais recommandé)
+□ Ports 80, 443, 8000 ouverts (dans Contabo)
+□ Vous m'aviez dit "j'ai un VPS avec Contabo" ✓
+
+═════════════════════════════════════════════════════════════
+
+📚 DOCUMENTATION
+
+Consultez dans cet ordre :
+
+1. CONTABO-DEPLOY.md
+   → Guide complet avec explications
+   
+2. scripts/README.md
+   → Détails de chaque script
+   
+3. DEPLOY.md
+   → Options alternatives de déploiement
+   
+4. docker-compose.yml
+   → Configuration Docker
+
+═════════════════════════════════════════════════════════════
+
+🔒 RECOMMANDATIONS SÉCURITÉ
+
+□ Changer le mot de passe root
+□ Ajouter une clé SSH (à la place du mot de passe)
+□ Configurer un firewall :
+    sudo ufw enable
+    sudo ufw allow 22/tcp
+    sudo ufw allow 80/tcp
+    sudo ufw allow 443/tcp
+
+□ Mettre à jour régulièrement :
+    sudo apt update && sudo apt upgrade -y
+
+□ Activer SSL automatique (Let's Encrypt)
+    ./scripts/setup-nginx.sh votre-domaine.com
+
+═════════════════════════════════════════════════════════════
+
+🎯 PROCHAINES ÉTAPES
+
+1. Pousser les changements sur GitHub :
+   git add scripts/ *.md *.yml
+   git commit -m "Add Contabo deployment support"
+   git push
+
+2. Se connecter à votre Contabo :
+   ssh root@votre-ip
+
+3. Exécuter l'installation :
+   ./scripts/install-contabo.sh
+
+4. Lancer l'app :
+   docker-compose build
+   docker-compose up -d
+
+5. Vérifier :
+   ./scripts/check-contabo.sh
+
+═════════════════════════════════════════════════════════════
+
+🎉 VOUS ÊTES PRÊT POUR CONTABO !
+
+Tous les fichiers nécessaires sont prêts, les scripts
+sont testables, et la documentation est complète.
+
+Bon déploiement ! 🚀
+
+═════════════════════════════════════════════════════════════

@@ -1,0 +1,108 @@
+📱 OpenMap Agents - Instructions de déploiement final
+
+✅ L'application est prête à être déployée !
+
+═══════════════════════════════════════════════════════════════
+
+🎯 RÉSUMÉ DES FICHIERS CRÉÉS
+
+1. Dockerfile                 → Image Docker multi-stage
+2. docker-compose.yml         → Orchestration des conteneurs
+3. DEPLOY.md                  → Guide complet (4 options)
+4. QUICKSTART-DEPLOY.md       → Déploiement rapide (< 5 min)
+5. check-deploy.sh            → Script de vérification
+6. .env.example               → Modèle de configuration
+
+═══════════════════════════════════════════════════════════════
+
+🚀 DÉPLOIEMENT EN 3 ÉTAPES (VPS Linux + Docker)
+
+ÉTAPE 1 : Préparer votre .env
+─────────────────────────────
+  $ cp .env.example .env
+  $ nano .env
+
+  Remplacer    : LLM_PROVIDER=openai
+                 OPENAI_API_KEY=sk-votre-clé-complète
+
+ÉTAPE 2 : Construire l'image Docker
+────────────────────────────────────
+  $ docker-compose build
+
+ÉTAPE 3 : Lancer l'application
+───────────────────────────────
+  $ docker-compose up -d
+
+  ✓ L'App est accessible à → http://votre-serveur:8000
+  ✓ API Documentation     → http://votre-serveur:8000/docs
+  ✓ Health Check          → http://votre-serveur:8000/health
+
+═══════════════════════════════════════════════════════════════
+
+📋 COMMANDES UTILES
+
+Voir les logs en temps réel :
+  $ docker-compose logs -f
+
+Arrêter l'application :
+  $ docker-compose down
+
+Redémarrer :
+  $ docker-compose restart
+
+Mettre à jour (depuis GitHub) :
+  $ git pull origin main
+  $ docker-compose build --no-cache
+  $ docker-compose up -d
+
+═══════════════════════════════════════════════════════════════
+
+🔒 BONUS : HTTPS gratuit avec Let's Encrypt
+
+Si vous avez un domaine, installer Nginx + Certbot :
+
+  $ sudo apt install -y nginx certbot python3-certbot-nginx
+  
+  # Créer le proxy Nginx
+  $ sudo nano /etc/nginx/sites-available/openmapagents
+  
+  # Copier la config depuis QUICKSTART-DEPLOY.md
+  
+  # Obtenir le certificat SSL
+  $ sudo certbot --nginx -d votre-domaine.com
+
+   Votre app sera accessible à → https://votre-domaine.com
+
+═══════════════════════════════════════════════════════════════
+
+📚 RESSOURCES ADDITIONNELLES
+
+- Architecture              : README.md
+- Déploiement complet       : DEPLOY.md
+- Déploiement rapide        : QUICKSTART-DEPLOY.md
+- Frontend production       : frontend/dist/ ✓
+- Backend optimisé          : backend/backend.py ✓
+
+═══════════════════════════════════════════════════════════════
+
+❓ QUESTIONS ?
+
+Les fichiers suivants vont vous aider :
+  • QUICKSTART-DEPLOY.md    → Pour un déploiement simple
+  • DEPLOY.md               → Pour les cas spécifiques
+  • backend/.env            → Configuration LLM
+  • docker-compose.yml      → Variables d'environnement
+
+═══════════════════════════════════════════════════════════════
+
+🎉 C'est terminé ! 
+
+Avez-vous besoin d'aide pour :
+  □ Configurer votre VPS Linux ?
+  □ Installer Docker sur votre serveur ?
+  □ Configurer HTTPS/SSL ?
+  □ Optimiser les performances ?
+
+Dites-moi et je vais vous aider ! 😊
+
+═══════════════════════════════════════════════════════════════
